@@ -1,0 +1,66 @@
+[submodule "go-ipfs"]
+	path = go-ipfs
+	url = https://github.com/magicwave-io/go-ipfs.git
+	branch = pp_master
+	update = rebase
+[submodule "go-ipfs-config"]
+	path = go-ipfs-config
+	url = https://github.com/magicwave-io/go-ipfs-config.git
+	branch = pp_master
+	update = rebase
+[submodule "go-bitswap"]
+	path = go-bitswap
+	url = https://github.com/magicwave-io/go-bitswap.git
+	branch = pp_master
+[submodule "go-eventbus"]
+	path = go-eventbus
+	url = https://github.com/magicwave-io/go-eventbus.git
+    branch = pp_master
+    update = rebase
+[submodule "go-libp2p"]
+	path = go-libp2p
+	url = https://github.com/magicwave-io/go-libp2p.git
+	branch = pp_master
+	update = rebase
+[submodule "go-libp2p-core"]
+	path = go-libp2p-core
+	url = https://github.com/magicwave-io/go-libp2p-core.git
+	branch = pp_master
+[submodule "go-libp2p-onion-transport"]
+	path = go-libp2p-onion-transport
+	url = https://github.com/magicwave-io/go-libp2p-onion-transport.git
+	branch = pp_master
+	update = rebase
+[submodule "go-multiaddr"]
+	path = go-multiaddr
+	url = https://github.com/magicwave-io/go-multiaddr.git
+    branch = pp_master
+    update = rebase
+[submodule "go-multiaddr-net"]
+	path = go-multiaddr-net
+	url = https://github.com/magicwave-io/go-multiaddr-net.git
+	branch = pp_master
+	update = rebase
+
+[submodule "go-libp2p-swarm"]
+	path = go-libp2p-swarm
+	url = https://github.com/magicwave-io/go-libp2p-swarm.git
+    branch = pp_master
+    update = rebase
+[submodule "go-unixfs"]
+	path = go-unixfs
+	url = https://github.com/magicwave-io/go-unixfs.git
+[submodule "go-payment-service"]
+	path = go-payment-service
+    url = https://github.com/magicwave-io/PaymentServices.git
+	branch = pp_master
+[submodule "go-libp2p-kad-dht"]
+	path = go-libp2p-kad-dht
+	url = https://github.com/magicwave-io/go-libp2p-kad-dht.git
+    branch = pp_master
+    update = rebase
+[submodule "go-libp2p-kbucket"]
+	path = go-libp2p-kbucket
+	url = https://github.com/magicwave-io/go-libp2p-kbucket.git
+	branch = master
+	update = rebase
