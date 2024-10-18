@@ -1,0 +1,102 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- pp_master
+
+workspace:
+  clean: all
+
+strategy:
+  matrix: 
+    linux:
+      poolName: 'Ubuntu_Pool'
+      vmImage:
+      osName: 'linux'
+      ext: ''
+      addldflags: ''
+      addBuildNumber: 'BUILD_NUMBER=$(Build.BuildNumber)'
+    windows:
+      poolName: 'Windows_Pool'
+      vmImage:
+      osName: 'windows'
+      ext: ".exe"
+      addldflags: '-ldflags -H=windowsgui'
+      addBuildNumber: ''
+    mac:
+      poolName: 'Azure Pipelines'
+      vmImage: 'macOS-10.14'
+      osName: 'mac'
+      ext: ''
+      addldflags: ''
+      addBuildNumber: 'BUILD_NUMBER=$(Build.BuildNumber)'
+
+pool:
+  name: $(poolName)
+  vmImage: $(vmImage)
+
+variables:
+   major: 1
+   minor: 0
+
+name: $(major).$(minor)$(Rev:.r)
+
+steps:
+- task: InstallSSHKey@0
+  inputs:
+    knownHostsEntry: 'ssh.dev.azure.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H'
+    sshPublicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDbFMfrNTVm6C6h03KPSO5QSdvkGpGVSZ5wvbklVJtB3XuhKb7urQYIp7zn/av5uRisJvpYJ3BWGXOfINHXPm/phBBXBR3zPFF6QZYqxFy50LVqeVPBUJpoxY+/SdipQFAs3CCTckVeQYmu3DDfuRVUMGJPljIeI2yqT8d1P3DuzmduCo+HwvBTQu6vOUaAiGLyAez4AnJqY+hFdub4RbUJq+7FrFlO02f+xDM8ZwEZqZ9grAJSpe/TiMgFDr2FNPwi5ZoTnF9Zztlsrir3foSafO61kEPGn/iajgDUrdLcKpw1oeDqLj+bijP8YVbUjoW7/GMTPOI7zPyirBqsokI62mPNsn5uGmoNR5IUd7SjZveB5bI/hWVVn47JOrxW1Csybu/TblMSRpFtmXNRpBoHiG6dBqTNiIeI1KK8+UTvw7vBVLGMnpvjKZDtC3DnRA493TVecU5/TQOdBNObGtGaJdNBhAagTj2eZfRxjBC3iywymvQZozsDJz/bFIefRV8= alex@alex-VB'
+    sshKeySecureFile: 'key'
+  displayName: "Create SSH files"
+
+- checkout: self
+  clean: true
+  submodules: recursive
+  displayName: 'Fetching all the changes'
+
+- script: |
+    go mod download github.com/bobesa/go-domain-util
+    go mod download github.com/golang/protobuf
+    go get github.com/ipfs/go-ipfs/cmd/ipfs
+  workingDirectory: $(Build.SourcesDirectory)/go-ipfs/cmd/ipfs
+  displayName: 'go download deps'
+
+- script: |
+    $(addBuildNumber) go build -v $(addldflags)
+  workingDirectory: $(Build.SourcesDirectory)/go-ipfs/cmd/ipfs
+  displayName: 'Building Go Ipfs'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/go-ipfs/cmd/ipfs/ipfs$(ext)'
+    includeRootFolder: true
+    archiveType: '7z'
+    sevenZipCompression: 'ultra'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ipfs-$(osName)-$(Build.BuildNumber).7z'
+    replaceExistingArchive: true
+    verbose: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'ipfs'
+    publishLocation: 'Container'
+
+# - task: Docker@1
+#   inputs:
+#     containerregistrytype: 'Azure Container Registry'
+#     azureSubscriptionEndpoint: 'U-BTech - CSP (Georest)(8a8eed1d-a101-45a3-bb4d-34065921a9aa)'
+#     azureContainerRegistry: 'torplusserviceregistry.azurecr.io'
+#     command: 'login'
+#   displayName: 'Docker login'
+#   condition: eq(variables.osName, 'linux')
+
+# - script: |
+#     make build_image && make image && make push
+#     make image_ipfs_haproxy && make push_ipfs_haproxy 
+#     make clean_up
+#   workingDirectory: $(Build.SourcesDirectory)/docker
+#   displayName: 'Docker build and push ipfs'
+#   condition: eq(variables.osName, 'linux')
