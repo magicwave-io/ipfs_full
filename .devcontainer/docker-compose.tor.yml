@@ -1,0 +1,210 @@
+version: "3.9"
+services:
+  dirauth1: # dirauth
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: dirauth1
+    environment:
+      - cname=dirauth1
+      - role=dirauth
+      - nickname=cont1
+      - seed=SANY52XSOPR75OGRJIY2RA6OQCLCVXVJ7KVKC66WO2A42MVX5PVBZV6V
+    volumes:
+      - ./docker/dirauthority/common/dirauth1tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/key1:/root/tor/keys/
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+      #- ./docker/dirauthority/common/dirauth1torData:/root/tor
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network
+  dirauth2: # dirauth
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: dirauth2
+    environment:
+      - cname=dirauth2
+      - role=dirauth
+      - nickname=cont2
+      - seed=SAGJ5QRQTHOQWQBWZQBMKKGG7BKMWTDHXMCQOOQL6V76HTLB4OG6GH3W
+    volumes:
+      - ./docker/dirauthority/common/dirauth2tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/key2:/root/tor/keys/
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+      #- ./docker/dirauthority/common/dirauth2torData:/root/tor
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network
+  dirauth3: # dirauth
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: dirauth3
+    environment:
+      - cname=dirauth3
+      - role=dirauth
+      - nickname=cont3
+      - seed=SAHN7JFU3IPPEOTDN5TQMD3DDJAD5CE2BP4U4A45MS2TK2RUZVJ5FIA4
+    volumes:
+      - ./docker/dirauthority/common/dirauth3tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/key3:/root/tor/keys/
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+      #- ./docker/dirauthority/common/dirauth3torData:/root/tor
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network  
+  exit1:  # exit 1
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: exit1
+    environment:
+      - cname=exit1
+      - role=exit
+      - nickname=cont4
+      - seed=SBR6KDKON6RUO4CX733LN3Y3TA25GTLXXV2XSR2P5MF3XLI26W6GXKPM
+    volumes:
+      - ./docker/dirauthority/common/exit1tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network  
+  exit2: # exit 2
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: exit2
+    environment:
+      - cname=exit2
+      - role=exit
+      - nickname=cont5
+      - seed=SAXZEPDOJOLR7UVIEGIXNHJOA7QISAXMQPHBHGLPCCB3AY3YZO4AFSRZ
+    volumes:
+      - ./docker/dirauthority/common/exit2tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network  
+  exit3: # exit 3
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: exit3
+    environment:
+      - cname=exit3
+      - role=exit
+      - nickname=cont6
+      - seed=SCWNU7SVSZCUHANJMZM5VXRJPF2E4W4BMJNPYFC2QZ4HQRMIPRERPVIW
+    volumes:
+      - ./docker/dirauthority/common/exit3tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network  
+  exit4: # exit 4
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: exit4
+    environment:
+      - cname=exit4
+      - role=exit
+      - nickname=cont7
+      - seed=SDI3I3RW3BG5FBXBZVLVHHG2XMKY77MI3BBH27H5ZTFYSN4L7TVAEVDF
+    volumes:
+      - ./docker/dirauthority/common/exit4tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network
+  exit5: # exit 5
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: exit5
+    environment:
+      - cname=exit5
+      - role=exit
+      - nickname=cont8
+      - seed=SDONKPT4HMEJHYZP5N4L5ZHRG5P67N5IKOPFGWKI3RRYVFBVMD2F65FI
+    volumes:
+      - ./docker/dirauthority/common/exit5tor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network 
+  client:  # client
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: client
+    environment:
+      - cname=client
+      - role=client
+      - nickname=cont9
+      - seed=SDNETK6UCNISGADGEW52MPCY4YH2JXWF5T5HLQ4L56OOIWUDULRPT3Z4
+    volumes:
+      - ./docker/dirauthority/common/clientTor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network  
+  hs_client: # hs_client
+    build: 
+      context: ./docker/dirauthority
+      dockerfile: ../../Tor.Dockerfile
+    container_name: hs_client
+    environment:
+      - cname=hs_client
+      - role=hs_client
+      - nickname=cont10
+      - seed=SBTO55TFL7LNLFMHFFE7JHXQMQRXRK2HLMHCFX3R5JXMPFHDTKXSFPE2
+    volumes:
+      - ./docker/hd_client/www:/opt/www/
+      - ./docker/dirauthority/common/hidden_service:/root/tor/hidden_service
+      - ./docker/dirauthority/common/hs_clientTor:/usr/local/etc/tor
+      - ./docker/dirauthority/common/key10:/root/tor/keys/
+      - ./docker/dirauthority/common/:/opt/paidpiper/common
+      - ./docker/dirauthority/script/:/opt/paidpiper/script/
+      - ./docker/dirauthority/conf_template/:/opt/paidpiper/conf_template/
+    entrypoint: /bin/bash
+    command: /opt/paidpiper/script/start.sh
+    networks:
+      - ipfs-network
+networks:
+  ipfs-network:
+    driver: bridge
+    ipam:
+      config:
+      #  - subnet: 10.5.0.0/16
+      #    gateway: 10.5.0.1
+      - subnet: 192.169.0.0/24
+        gateway: 192.169.0.1
