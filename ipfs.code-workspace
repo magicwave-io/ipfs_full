@@ -1,0 +1,61 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "full"
+		},
+		{
+			"path": "./go-bitswap",
+			"name": "go-bitswap"
+		},
+		{
+			"path": "./go-eventbus",
+			"name": "go-eventbus"
+		},
+		{
+			"path": "./go-ipfs",
+			"name": "go-ipfs"
+		},
+		{
+			"path": "./go-ipfs-config",
+			"name": "go-ipfs-config"
+		},
+		{
+			"path": "./go-libp2p",
+			"name": "go-libp2p"
+		},
+		{
+			"path": "./go-libp2p-core",
+			"name": "go-libp2p-core"
+		},
+		{
+			"path": "./go-libp2p-kad-dht",
+			"name": "go-libp2p-kad-dht"
+		},
+		{
+			"path": "./go-libp2p-kbucket",
+			"name": "go-libp2p-kbucket"
+		},
+		{
+			"path": "./go-libp2p-onion-transport",
+			"name": "go-libp2p-onion-transport"
+		},
+		{
+			"path": "./go-libp2p-swarm",
+			"name": "go-libp2p-swarm"
+		},
+		{
+			"path": "./go-multiaddr",
+			"name": "go-multiaddr"
+		},
+		{
+			"path": "./go-multiaddr-net",
+			"name": "go-multiaddr-net"
+		},
+		{
+			"path": "./go-payment-service/PaymentGateway/",
+			"name": "go-payment-gateway"
+		}
+	],
+	"settings": {}
+}

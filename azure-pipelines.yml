@@ -1,0 +1,152 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- pp_master
+
+workspace:
+  clean: all
+
+strategy:
+  matrix: 
+    linux:
+      poolName: 'Ubuntu_Pool'
+      vmImage:
+      osName: 'linux'
+      arch: 'amd64'
+      ext: ''
+      addldflags: ''
+      addBuildNumber: 'BUILD_NUMBER=$(Build.BuildNumber)'
+      goVersion: '1.16.15'
+    windows:
+      poolName: 'Windows_Pool'
+      vmImage:
+      osName: 'windows'
+      arch: 'amd64'
+      ext: ".exe"
+      addldflags: '-ldflags -H=windowsgui'
+#      addBuildNumber: 'BUILD_NUMBER=$(Build.BuildNumber)'
+      addBuildNumber: ''
+      goVersion: '1.16.15'
+    mac:
+      poolName: 'Azure Pipelines'
+      vmImage: 'macOS-14'
+      osName: 'mac'
+      arch: 'amd64'
+      ext: ''
+      addldflags: ''
+      addBuildNumber: 'BUILD_NUMBER=$(Build.BuildNumber)'
+      goVersion: '1.16.15'
+      # GOOS: 'darwin'  # For ARM Build
+      # GOARCH: 'arm64'
+    macarm:
+      poolName: 'MacOSArm64'
+      osName: 'mac'
+      arch: 'arm64'
+      ext: ''
+      addldflags: ''
+      addBuildNumber: 'BUILD_NUMBER=$(Build.BuildNumber)'
+      goVersion: '1.16.15'
+
+pool:
+  name: $(poolName)
+  vmImage: $(vmImage)
+
+variables:
+  major: 1
+  minor: 0
+
+name: $(major).$(minor)$(Rev:.r)
+
+steps:
+- task: GoTool@0
+  inputs:
+    version: '$(goVersion)'
+  condition: ne( variables['arch'], 'arm64' )
+
+- script: |
+    mkdir -p $(Build.BinariesDirectory)/go$(goVersion)
+    curl -LO https://golang.org/dl/go$(goVersion).darwin-arm64.tar.gz
+    tar -C $(Build.BinariesDirectory)/go$(goVersion) -xzf go$(goVersion).darwin-arm64.tar.gz --strip-components=1
+    echo "Installed Go $(goVersion) into $(Build.BinariesDirectory)/go$(goVersion)"
+  condition: eq( variables['arch'], 'arm64' )
+  displayName: 'Go $(goVersion) installation for macarm'
+
+# on our build servers installed gvm (Golang Version Manager), short name is "g". To install new\another version of golang just type on a server "g install 1.22.3" (1.22.3 - is a golang version). ### https://github.com/voidint/g
+#- script: |
+#    g use 1.16.15
+#  workingDirectory: $(Build.SourcesDirectory)
+#  displayName: 'Golang Version Manager'
+#  condition: ne(variables.osName, 'mac')
+
+- task: InstallSSHKey@0
+  inputs:
+    knownHostsEntry: 'ssh.dev.azure.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H'
+    sshPublicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDbFMfrNTVm6C6h03KPSO5QSdvkGpGVSZ5wvbklVJtB3XuhKb7urQYIp7zn/av5uRisJvpYJ3BWGXOfINHXPm/phBBXBR3zPFF6QZYqxFy50LVqeVPBUJpoxY+/SdipQFAs3CCTckVeQYmu3DDfuRVUMGJPljIeI2yqT8d1P3DuzmduCo+HwvBTQu6vOUaAiGLyAez4AnJqY+hFdub4RbUJq+7FrFlO02f+xDM8ZwEZqZ9grAJSpe/TiMgFDr2FNPwi5ZoTnF9Zztlsrir3foSafO61kEPGn/iajgDUrdLcKpw1oeDqLj+bijP8YVbUjoW7/GMTPOI7zPyirBqsokI62mPNsn5uGmoNR5IUd7SjZveB5bI/hWVVn47JOrxW1Csybu/TblMSRpFtmXNRpBoHiG6dBqTNiIeI1KK8+UTvw7vBVLGMnpvjKZDtC3DnRA493TVecU5/TQOdBNObGtGaJdNBhAagTj2eZfRxjBC3iywymvQZozsDJz/bFIefRV8= alex@alex-VB'
+    sshKeySecureFile: 'key'
+  displayName: "Create SSH files"
+
+- checkout: self
+  clean: true
+  submodules: recursive
+  displayName: 'Fetching all the changes'
+
+#- script: |
+#    go mod download github.com/bobesa/go-domain-util
+#    go mod download github.com/golang/protobuf
+#    go get github.com/ipfs/go-ipfs/cmd/ipfs
+#  workingDirectory: $(Build.SourcesDirectory)/go-ipfs/cmd/ipfs
+#  displayName: 'go download deps'
+
+- script: |
+    $(addBuildNumber) make build_$(osName)
+  workingDirectory: $(Build.SourcesDirectory)
+  displayName: 'Building Go Ipfs'
+  condition: ne( variables['arch'], 'arm64' )
+
+# Build step for arm
+- script: |
+    export PATH=$(Build.BinariesDirectory)/go$(goVersion)/bin:$PATH
+    $(addBuildNumber) make build_$(osName)
+  workingDirectory: $(Build.SourcesDirectory)
+  displayName: 'Building Go Ipfs for macarm'
+  condition: eq( variables['arch'], 'arm64' )
+
+# Check architecture
+- script: |
+    file ./ipfs
+  workingDirectory: $(Build.SourcesDirectory)
+  displayName: 'Check architecture arm or amd'
+  condition: eq( variables['osName'], 'mac' )
+
+# Install 7zip for macarm
+- script: |
+    curl -L -o 7z-mac.tar.xz https://www.7-zip.org/a/7z2301-mac.tar.xz
+    mkdir -p 7z
+    tar -xf 7z-mac.tar.xz -C 7z
+    chmod +x ./7z/7zz
+  displayName: 'Install 7-Zip for macOS ARM64'
+  condition: eq( variables['arch'], 'arm64' )
+- script: |
+    ./7z/7zz a -t7z -mx=9 "$(Build.ArtifactStagingDirectory)/ipfs-$(osName)-$(arch)-$(Build.BuildNumber)-with-info.7z" "$(Build.SourcesDirectory)/ipfs$(ext)"
+  displayName: 'Create 7z archive on macarm'
+  condition: eq( variables['arch'], 'arm64' )
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/ipfs$(ext)'
+    includeRootFolder: true
+    archiveType: '7z'
+    sevenZipCompression: 'ultra'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ipfs-$(osName)-$(arch)-$(Build.BuildNumber)-with-info.7z'
+    replaceExistingArchive: true
+    verbose: true
+  condition: ne( variables['arch'], 'arm64' )
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'ipfs'
+    publishLocation: 'Container'
