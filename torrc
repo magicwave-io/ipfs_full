@@ -1,0 +1,81 @@
+# Below is the refernece tor configuration for torplus.
+# This is client configuration with several fields that can be optionally enabled for server deployment
+# Important: By default tor runs without console output, to enable console operation please set TOR_PLUS_CMD env variable to 1 before running tor.
+# Generally it's a good idea to set TOR_PLUS_CMD to 1 in profile startup script for development machines.
+# To run tor with local torrc file, run ./tor -f torrc otherwise it may pick up another file in a standard location.
+
+
+
+
+# The folder below need to be located on the machine, usually in the installation folder
+# Below is the windows location, adapt for your OS.
+DataDirectory C:\Users\Michael\Desktop\Tor Browser\Browser\TorBrowser\Data\Tor
+GeoIPFile .\geoip
+GeoIPv6File .\geoip6
+
+# Specify that we aren't using production parameters for tor.
+# This sets different values for many different parameters, and that's how we currently use it with torplus.
+# More info on what's configured is here: https://manpages.debian.org/testing/tor/tor.1.en.html#TESTING_NETWORK_OPTIONS
+
+TestingTorNetwork 1
+
+# Disable scrubbing - node ids and other non-anonymous data will appear in logs, use for debugging only.
+SafeLogging 0
+
+# Log info log level to STDOUT
+Log info stdout
+
+# Log debug log level to file, note that this tends to pile up quickly.
+#Log debug file tor.log
+
+# Addresses of torplus directory authority servers
+DirAuthority DirectoryAuth1 orport=5037 v3ident=1BE159C01A961126E8B9E351035627A4089170C8 40.122.73.35:7001 786AA59A067DEC026B658D2D2C59BA2AA9D6BF1A
+DirAuthority DirectoryAuth2 orport=5037 v3ident=C5C06B6FD07B55A4169B98CCD744CAC2E75E58DA 40.114.33.78:7001 E076CE874D1868246C6D661D83767DC4A077CEC2
+DirAuthority DirectoryAuth3 orport=5037 v3ident=E39E9ECC603EBBE83EED45273AB6F115B7986E46 52.183.135.96:7001 E836AF8531A14CF3D20F2D8395B594084A3FCABC
+DirAuthority DirectoryAuth4 orport=5037 v3ident=8785F4031A424C5B4A240FAC116E9753C40315C2 52.238.252.11:7001 2EA1D53B923F7F7B4CF8A4E7E29F3AC129F1728B
+DirAuthority DirectoryAuth5 orport=5037 v3ident=FB631E43EDD7D1FCC71149FA3BE70FBD357E4FFC 40.91.240.246:7001 34D1CBC6DAEBF7A040AAB2072F518B02B5AD7414
+
+
+# Local address, should only be set directly if on a multi LAN machine, or behind a complex NAT. 
+# For simple  scenarios tor will discover the external IP by itself.
+#Address 79.183.30.32
+
+# Port configuration
+# SOCKS proxy is used by clients AND by modules with embedded client functionality such as IPFS
+SocksPort 9050
+
+# ControlPort is used by applicaton that need to configure or query tor (IPFS)
+ControlPort 9051
+
+# OR port is used for internal tor connectivity (to other tor nodes, OR = Onion Routing)
+ORPort 5037
+
+
+PPChannelCallbackPort 5817
+PPChannelPort 28080
+#EnablePaymentLog 1
+
+Nickname clientnodemk
+
+EnforceDistinctSubnets 0
+
+
+# Below is required on server nodes for non-anonymous HS
+#HiddenServiceNonAnonymousMode 1
+#HiddenServiceSingleHopMode 1
+#SocksPort 0
+
+# Configuration below is required if local ports (i.e. for IPFS) are to be exposed over tor as hidden services.
+# Note that the folder below should be creatable or already created with the correct permissions (700).
+# If not, tor will fail on startup
+HiddenServiceDir "C:/tor_service"
+
+# IPFS gateway port, great for testing
+HiddenServicePort 8080 127.0.0.1:8080
+# IPFS main (p2p) port
+HiddenServicePort 4001 127.0.0.1:4001
+# IPFS api port
+HiddenServicePort 5001 127.0.0.1:5001
+
+# Don't use far away, high latency nodes
+ExcludeNodes {us},{uk},{gb},{ae},{in},{jp},{au},{fr},{ie},{ch},{sg},{il}
