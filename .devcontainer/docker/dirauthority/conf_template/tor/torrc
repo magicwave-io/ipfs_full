@@ -1,0 +1,47 @@
+TestingTorNetwork 1
+
+PathsNeededToBuildCircuits 0.67
+TestingDirAuthVoteExit *
+TestingDirAuthVoteHSDir *
+V3AuthNIntervalsValid 2
+CircuitsAvailableTimeout 3600
+CountPrivateBandwidth 0
+MaxCircuitDirtiness 544000
+AccountingStart day 0:00
+AccountingMax 50 GBytes
+RelayBandwidthRate 1000 KBytes
+RelayBandwidthBurst 5000 KBytes
+
+TestingDirAuthVoteGuard *
+TestingMinExitFlagThreshold 0
+
+DataDirectory /root/tor
+RunAsDaemon 0
+ConnLimit 60
+Nickname cont1
+ShutdownWaitLength 2
+DisableDebuggerAttachment 0
+
+ControlPort 9051
+ControlSocket /root/tor/control
+CookieAuthentication 1
+PidFile /root/tor/pid
+
+PPChannelCallbackPort 5817
+PPChannelPort 28080
+EnablePaymentLog 1
+
+ProtocolWarnings 1
+SafeLogging 0
+LogTimeGranularity 1
+
+Sandbox 1
+
+DirAuthority cont2 orport=5037 v3ident=C7AE86389E2585B4A22CFF3EA32EEA666D867887 192.168.0.102:7001 C3CA6D644326EAD4F29C2ACFA0A09241DA61DC77
+DirAuthority cont3 orport=5037 v3ident=1B98E0E54FB3F185EDE7BB03D722AB8FC1EA7B3D 192.168.0.103:7001 F07F6B1F966B8E6A5257E24E5CBF890C0D72A7C2
+DirAuthority cont4 orport=5037 v3ident=5A98BAC422761B541D1DCEBA9BAB04B89F0CA560 192.168.0.104:7001 DF61CFCD18B10F0EFF026F9D07F5DB39099A5499
+SocksPort 9050
+
+ExitPolicy reject *:*
+ExitPolicy reject6 *:*
+Address 192.168.0.101

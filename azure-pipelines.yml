@@ -1,0 +1,89 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- pp_master
+
+strategy:
+  matrix: 
+    linux:
+      poolName: 'Ubuntu_Pool'
+      vmImage:
+      osName: 'linux'
+      ext: ''
+      addldflags: ''
+    windows:
+      poolName: 'Windows_Pool'
+      vmImage:
+      osName: 'windows'
+      ext: ".exe"
+      addldflags: '-ldflags -H=windowsgui'
+    mac:
+      poolName: 'Azure Pipelines'
+      vmImage: 'macOS-10.14'
+      osName: 'mac'
+      ext: ''
+      addldflags: ''
+
+pool:
+  name: $(poolName)
+  vmImage: $(vmImage)
+
+variables:
+   major: 1
+   minor: 0
+
+name: $(major).$(minor)$(Rev:.r)
+
+steps:
+- task: InstallSSHKey@0
+  inputs:
+    knownHostsEntry: 'github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=='
+    sshPublicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDbFMfrNTVm6C6h03KPSO5QSdvkGpGVSZ5wvbklVJtB3XuhKb7urQYIp7zn/av5uRisJvpYJ3BWGXOfINHXPm/phBBXBR3zPFF6QZYqxFy50LVqeVPBUJpoxY+/SdipQFAs3CCTckVeQYmu3DDfuRVUMGJPljIeI2yqT8d1P3DuzmduCo+HwvBTQu6vOUaAiGLyAez4AnJqY+hFdub4RbUJq+7FrFlO02f+xDM8ZwEZqZ9grAJSpe/TiMgFDr2FNPwi5ZoTnF9Zztlsrir3foSafO61kEPGn/iajgDUrdLcKpw1oeDqLj+bijP8YVbUjoW7/GMTPOI7zPyirBqsokI62mPNsn5uGmoNR5IUd7SjZveB5bI/hWVVn47JOrxW1Csybu/TblMSRpFtmXNRpBoHiG6dBqTNiIeI1KK8+UTvw7vBVLGMnpvjKZDtC3DnRA493TVecU5/TQOdBNObGtGaJdNBhAagTj2eZfRxjBC3iywymvQZozsDJz/bFIefRV8= alex@alex-VB'
+    sshKeySecureFile: 'key'
+  displayName: "Create SSH files"
+  condition: eq(variables.osName, 'mac')
+
+- script: |
+    ssh-keyscan -t rsa ssh.dev.azure.com >> ~/.ssh/known_hosts
+  workingDirectory: $(Build.SourcesDirectory)
+  displayName: 'add ssh'
+  condition: eq(variables.osName, 'mac')
+
+- checkout: self 
+  clean: true
+  submodules: recursive
+  displayName: 'Fetching all the changes'
+
+- script: |
+    go build -v $(addldflags)
+  workingDirectory: $(Build.SourcesDirectory)/go-ipfs/cmd/ipfs
+  displayName: 'Building Go Ipfs'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/go-ipfs/cmd/ipfs/ipfs$(ext)'
+    includeRootFolder: true
+    archiveType: '7z'
+    sevenZipCompression: 'ultra'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ipfs-$(osName)-$(Build.BuildNumber).7z'
+    replaceExistingArchive: true
+    verbose: true
+
+#- task: ArchiveFiles@2
+#  inputs:
+#    rootFolderOrFile: '$(Build.SourcesDirectory)/go-ipfs/cmd/ipfs/ipfs$(ext)'
+#    includeRootFolder: true
+#    archiveType: '7z'
+#    sevenZipCompression: 'ultra'
+#    archiveFile: '$(Build.ArtifactStagingDirectory)/ipfs-$(osName)-latest.7z'
+#    replaceExistingArchive: true
+#    verbose: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'ipfs'
+    publishLocation: 'Container'
