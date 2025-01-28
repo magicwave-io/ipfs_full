@@ -1,0 +1,60 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+strategy:
+  matrix: 
+    linux:
+      poolName: 'Ubuntu_Pool'
+      osName: 'linux'
+      ext: ''
+      addldflags: ''
+    windows:
+      poolName: 'Windows_Pool'
+      osName: 'windows'
+      ext: ".exe"
+      addldflags: '-ldflags -H=windowsgui'
+
+pool:
+  name: $(poolName)
+
+steps:
+- checkout: self 
+  clean: true
+  submodules: recursive
+  displayName: 'Fetching all the changes'
+
+- script: |
+    go build -v $(addldflags)
+  workingDirectory: $(Build.SourcesDirectory)/go-ipfs/cmd/ipfs
+  displayName: 'Building Go Ipfs'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/go-ipfs/cmd/ipfs/ipfs$(ext)'
+    includeRootFolder: true
+    archiveType: '7z'
+    sevenZipCompression: 'ultra'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ipfs-$(osName)-$(Build.BuildId).7z'
+    replaceExistingArchive: true
+    verbose: true
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/go-ipfs/cmd/ipfs/ipfs$(ext)'
+    includeRootFolder: true
+    archiveType: '7z'
+    sevenZipCompression: 'ultra'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ipfs-$(osName)-latest.7z'
+    replaceExistingArchive: true
+    verbose: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'ipfs'
+    publishLocation: 'Container'
